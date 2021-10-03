@@ -4,9 +4,11 @@ import { Brush, Options, DrawingMode, EventsMap } from './types'
 
 export class Drauu {
   el: SVGSVGElement | null = null
+  svgPoint: DOMPoint | null = null
   eventEl: Element | null = null
   shiftPressed = false
   altPressed = false
+  drawing = false
 
   private _emitter = createNanoEvents<EventsMap>()
   private _models = createModels(this)
@@ -62,6 +64,8 @@ export class Drauu {
       throw new Error('[drauu] target element not found')
     if (this.el.tagName !== 'svg')
       throw new Error('[drauu] can only mount to a SVG element')
+
+    this.svgPoint = this.el.createSVGPoint()
 
     const target: SVGSVGElement = this.resolveSelector(eventEl as any) || this.el!
 
@@ -128,7 +132,7 @@ export class Drauu {
   }
 
   private eventMove(event: PointerEvent) {
-    if (!this.acceptsInput(event))
+    if (!this.acceptsInput(event) || !this.drawing)
       return
 
     if (this.model._eventMove(event)) {
@@ -145,6 +149,7 @@ export class Drauu {
     event.preventDefault()
     if (this._currentNode)
       this.cancel()
+    this.drawing = true
     this._emitter.emit('start')
     this._currentNode = this.model._eventDown(event)
     if (this._currentNode)
@@ -153,7 +158,7 @@ export class Drauu {
   }
 
   private eventEnd(event: PointerEvent) {
-    if (!this.acceptsInput(event))
+    if (!this.acceptsInput(event) || !this.drawing)
       return
     const result = this.model._eventUp(event)
     if (!result) {
@@ -164,6 +169,7 @@ export class Drauu {
         this._currentNode = result
       this.commit()
     }
+    this.drawing = false
     this._emitter.emit('end')
     this._emitter.emit('changed')
   }

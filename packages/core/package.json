@@ -1,6 +1,6 @@
 {
   "name": "@drauu/core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -27,6 +27,6 @@
     "prepublishOnly": "nr build"
   },
   "dependencies": {
-    "perfect-freehand": "^0.5.3"
+    "perfect-freehand": "^1.0.4"
   }
 }
